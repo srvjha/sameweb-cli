@@ -73,10 +73,10 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
       messages,
     });
 
-    let rawContent = response.choices[0].message.content;
+    let rawContent = await response.choices[0].message.content;
     let parsedContent;
     try {
-      parsedContent = JSON.parse(rawContent);
+      parsedContent = await JSON.parse(rawContent);
     } catch (err) {
       console.error("❌ Failed to parse JSON:", rawContent);
       break;
@@ -133,5 +133,6 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
 
   console.log("✅ Agent finished");
 }
+
 
 

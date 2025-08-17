@@ -1,7 +1,7 @@
-# Sameweb CLI
+# sameweb CLI
 
 A powerful **CLI tool to clone websites into local folders** using **Puppeteer + AI**.  
-With Sameweb CLI, you can scrape, analyze, and replicate website structures effortlessly — ideal for prototyping, backups, or research.
+With sameweb CLI, you can scrape, analyze, and replicate website structures effortlessly — ideal for prototyping, backups, or research.
 
 ---
 
@@ -17,7 +17,7 @@ With Sameweb CLI, you can scrape, analyze, and replicate website structures effo
 
 ## 📦 Installation
 
-Sameweb CLI can be installed **globally** or **locally**, depending on your use case.
+sameweb CLI can be installed **globally** or **locally**, depending on your use case.
 
 ### 🔹 Global Installation (Recommended)
 
@@ -25,9 +25,9 @@ Global installation makes the CLI available **system-wide** so you can run it fr
 This is the preferred method since CLI tools are meant to be accessible everywhere.
 
 ```bash
-npm install -g Sameweb-cli
+npm install -g sameweb-cli
 # or using pnpm
-pnpm add -g Sameweb-cli
+pnpm add -g sameweb-cli
 ```
 
 ### USAGE
@@ -37,12 +37,12 @@ Here options are:
 - `--key`: OpenAI Key
 
 ```bash
-Sameweb-cli <url> [options]
+sameweb-cli <url> [options]
 ```
 
 ### 🔹 Local Development / Installation from Source
 
-If you want to run **Sameweb CLI** locally from the repo (without publishing to npm), follow these steps:
+If you want to run **sameweb CLI** locally from the repo (without publishing to npm), follow these steps:
 
 1. **Clone the repository**
 
