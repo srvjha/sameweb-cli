@@ -15,7 +15,7 @@ async function autoScroll(page) {
   await page.evaluate(async () => {
     await new Promise((resolve) => {
       let totalHeight = 0;
-      const distance = 500;
+      const distance = 1000;
       const timer = setInterval(() => {
         const scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
@@ -24,7 +24,7 @@ async function autoScroll(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 500);
+      }, 1000);
     });
   });
 }
@@ -40,6 +40,7 @@ export const getScrapeWebsite = async (url, directory) => {
   await delay(1000);
 
   await page.goto(url, { waitUntil: "domcontentloaded" });
+  await delay(5000);
   await autoScroll(page);
 
   // Grab HTML after scroll
@@ -88,5 +89,6 @@ export const getScrapeWebsite = async (url, directory) => {
   await browser.close();
   console.log("✅ Scraping done.");
 };
+
 
 
