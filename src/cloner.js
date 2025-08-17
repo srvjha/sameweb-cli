@@ -1,7 +1,9 @@
-import axios from "axios";
-import { openaiClient } from "../config/client.js";
+
 import { getScrapeWebsite } from "./scraper.js";
-import { exec } from "child_process";
+import { OpenAI } from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // async function executeCommand(cmd = "") {
 //   return new Promise((res, rej) => {
@@ -19,7 +21,7 @@ const TOOL_MAP = {
   getScrapeWebsite,
 };
 
-async function main() {
+export async function main(url,apiKey) {
   const SYSTEM_PROMPT = `
   You are an AI assistant who works on START, THINK and OUTPUT format.
   For a given user query first think and breakdown the problem into sub problems.
@@ -54,14 +56,19 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
     { role: "system", content: SYSTEM_PROMPT },
     {
       role: "user",
-      content: "Create a clone for this website: https://www.piyushgarg.dev/",
+      content: `Create a clone for this website: ${url}`,
     },
   ];
+
+  const client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY ?? apiKey,
+      baseURL: "https://models.github.ai/inference",
+  });
 
 
 
   while (true) {
-    const response = await openaiClient.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: "gpt-4.1-mini",
       messages,
     });
@@ -127,4 +134,4 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
   console.log("✅ Agent finished");
 }
 
-main();
+
