@@ -31,7 +31,7 @@ pnpm add -g sameweb-cli
 Simply run the command to start the interactive setup:
 
 ```bash
-sameweb-cli
+sameweb
 ```
 
 On first run, you'll be guided through:
@@ -41,7 +41,7 @@ On first run, you'll be guided through:
 ### Example Workflow
 
 ```bash
-$ sameweb-cli
+$ sameweb
 🚀 Welcome to sameweb-cli!
 📌 First time setup: You need to clone a website.
 🌐 Enter website URL to clone: https://example.com
