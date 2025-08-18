@@ -1,71 +1,54 @@
-
 import { getScrapeWebsite } from "./scraper.js";
 import { OpenAI } from "openai";
 import dotenv from "dotenv";
+import { SYSTEM_PROMPT } from "../helper/system.prompt.js";
+import { loadState } from "./cli.js";
+import { exec } from "child_process";
 
 dotenv.config();
 
-// async function executeCommand(cmd = "") {
-//   return new Promise((res, rej) => {
-//     exec(cmd, (error, data) => {
-//       if (error) {
-//         return res(`Error running command ${error}`);
-//       } else {
-//         res(data);
-//       }
-//     });
-//   });
-// }
+async function executeCommand(command) {
+  return new Promise((resolve) => {
+    if (!command || typeof command !== "string") {
+      return resolve({
+        code: 1,
+        stdout: "",
+        stderr: "Invalid command: must be a non-empty string",
+      });
+    }
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        return resolve({
+          code: error.code ?? 1,
+        });
+      }
+      resolve({
+        code: 0,
+      });
+    });
+  });
+}
+
 
 const TOOL_MAP = {
   getScrapeWebsite,
+  loadState,
+  executeCommand,
 };
 
-export async function main(url,apiKey) {
-  const SYSTEM_PROMPT = `
-  You are an AI assistant who works on START, THINK and OUTPUT format.
-  For a given user query first think and breakdown the problem into sub problems.
-  Always think multiple times before giving final OUTPUT.
-  
-  Available Tools:
-  - getScrapeWebsite(url:string , directory:string)
-
-  Rules:
-  - Strictly return valid JSON.
-  - Output JSON format:
-    { "step": "START | THINK | OUTPUT | OBSERVE | TOOL" , "content": "string", "tool_name": "string", "input": { "url": "string", "directory": "string" } }
-  - TOOL.input must always be an object with required params.
-  - After TOOL call, always wait for OBSERVE.
-  - Only end with step = OUTPUT.
-
-  Example:
-  User: "https://www.piyushgarg.dev/"
-  ASSISTANT: { "step": "START", "content": "The user is interested in scrapping this website" } 
-  ASSISTANT: { "step": "THINK", "content": "Let me see if there is any available tool for this query" } 
-  ASSISTANT: { "step": "THINK", "content": "I see that there is a tool available getScrapeWebsite which creates a folder" } 
-  ASSISTANT: { "step": "THINK", "content": "I need to call getScrapeWebsite for url 'https://www.piyushgarg.dev/' with directory name 'piyushgarg'" }
-  ASSISTANT: { "step": "TOOL", "tool_name": "getScrapeWebsite", "input": { "url": "https://www.piyushgarg.dev/", "directory": "piyushgarg" } }
-  DEVELOPER: { "step": "OBSERVE", "content": "Website cloned into folder 'piyushgarg'" }
-  ASSISTANT: { "step": "THINK", "content": "The tool has successfully cloned the website, so I can now give the final result." }
-  ASSISTANT: { "step": "OUTPUT", "content": "The website https://www.piyushgarg.dev/ has been cloned successfully into folder 'piyushgarg'. 
-To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
-
-`;
-
+export async function main(url, apiKey, input) {
   const messages = [
     { role: "system", content: SYSTEM_PROMPT },
     {
       role: "user",
-      content: `Create a clone for this website: ${url}`,
+      content: `${url ? `Create a clone for this website: ${url}` : input}`,
     },
   ];
 
   const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY ?? apiKey,
-      baseURL: "https://models.github.ai/inference",
+     apiKey: apiKey || process.env.OPENAI_API_KEY
   });
-
-
 
   while (true) {
     const response = await client.chat.completions.create({
@@ -112,10 +95,24 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
         continue;
       }
 
-      const { url, directory } = parsedContent.input;
-      const responseFromTool = await TOOL_MAP[toolToCall](url, directory);
+      let responseFromTool;
 
-      console.log(`🛠️ ${toolToCall}(${url}, ${directory}) =`, responseFromTool);
+      // 👇 check which tool
+      if (toolToCall === "getScrapeWebsite") {
+        const { url, directory } = parsedContent.input;
+        responseFromTool = await TOOL_MAP[toolToCall](url, directory);
+        // console.log(
+        //   `🛠️ ${toolToCall}(${url}, ${directory}) =`,
+        //   responseFromTool,
+        // );
+      } else if (toolToCall === "executeCommand") {
+        const { command } = parsedContent.input;
+        responseFromTool = await TOOL_MAP[toolToCall](command);
+        console.log(`🛠️ ${toolToCall}(${command}) =`, responseFromTool);
+      } else if (toolToCall === "loadState") {
+        responseFromTool = await TOOL_MAP[toolToCall]();
+        console.log(`🛠️ ${toolToCall}() =`, responseFromTool);
+      }
 
       messages.push({
         role: "developer",
@@ -133,6 +130,3 @@ To preview it, run: pnpm dlx http-server piyushgarg -p 8000" }
 
   console.log("✅ Agent finished");
 }
-
-
-
