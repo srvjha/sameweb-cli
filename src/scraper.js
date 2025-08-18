@@ -217,7 +217,7 @@ export const getScrapeWebsite = async (url, directory, options = {}) => {
       end_with_newline: true,
     });
 
-     html = html.replace(/"\/_next\//g, '"./_next/');
+    //  html = html.replace(/"\/_next\//g, '"./_next/');
 
     const assets = await page.evaluate(() => {
       const urls = [];

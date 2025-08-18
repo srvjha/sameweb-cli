@@ -1,6 +1,6 @@
 {
   "name": "sameweb-cli",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A CLI tool to clone websites into local folders using Puppeteer and AI. Useful for developers, researchers, and learners who want to quickly grab a site's structure and assets.",
   "main": "src/cloner.js",
   "type": "module",
